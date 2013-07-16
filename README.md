@@ -20,7 +20,8 @@ provides 11 bands ranging in spectrums from visible light, near infrared, and to
 |10       |Thermal Infrared TIRS 1: Heat    	  |100m	       |
 |11       |Thermal Infrared TIRS 2: Heat    	  |100m	       |
 
-_Sources_
+_Sources:_
+
 [Mapbox: Putting Landsat 8 Bands to Work](http://www.mapbox.com/blog/putting-landsat-8-bands-to-work/)
 [USGS: Landsat Data Product](http://landsat.usgs.gov/LDCM_DataProduct.php)
 [USGS: Landsat Band Desigination](http://landsat.usgs.gov/band_designations_landsat_satellites.php)
@@ -43,4 +44,5 @@ will be used to complete the calculations in processing a scene correctly.
 
 #### Running the Script
 From the terminal, change to the script's directory and use the python interpreter to run the script. Designate the full path of the Landsat's MTL.txt file.
+
 `$ python landsat_proc.py home/landsat/LC80370372013169LGN00_MTL.txt`
