@@ -18,8 +18,6 @@ create_layer_for_vector = True
 create_satvi = True
 L = 0.1
 create_evi_ndvi = True
-creat_TC = True
-create_Till = True
 CleanUp = True
 
 print sys.argv[1]
@@ -46,16 +44,16 @@ radiance_max_b7 = 'RADIANCE_MAXIMUM_BAND_7 = '
 radiance_min_b7 = 'RADIANCE_MINIMUM_BAND_7 = '
 
 #Set bands to respective varables
-blueband = fileroot + "_B20.TIF"
-greenband = fileroot + "_B30.TIF"
-redband = fileroot + "_B40.TIF"
-nirband = fileroot + "_B50.TIF"
-swir1band = fileroot + "_B60.TIF"
-swir2band = fileroot + "_B70.TIF"
-panband = fileroot + "_B80.TIF"
-cirrusband = fileroot + "_B90.TIF"
-tirs1band = fileroot + "_B10.TIF"
-tirs2band = fileroot + "_B11.TIF"
+#blueband = fileroot + "_B2.TIF"
+#greenband = fileroot + "_B3.TIF"
+redband = fileroot + '_B4.TIF'
+nirband = fileroot + '_B5.TIF'
+swir1band = fileroot + '_B6.TIF'
+swir2band = fileroot + '_B7.TIF'
+#panband = fileroot + "_B8.TIF"
+#cirrusband = fileroot + "_B9.TIF"
+#tirs1band = fileroot + "_B10.TIF"
+#tirs2band = fileroot + "_B11.TIF"
 
 # Verify the processed data is from Landsat 8
 # Read MTL file for verification
@@ -112,4 +110,64 @@ for inum in range(len(attribs)):
             lmin[jnum] = float(attribs[inum+1+jnum*2+1].split('=')[1])
         rad_finished = True
 
+#Calculate angles based on MTL data
+sun_zen_deg = 90.0 - sun_elev_deg
+theta = (np.pi * sun_zen_deg)/180.0
+toa_ref = 1.21068/sun_zen_deg 
+E = [toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref]
 
+#GDAL open and read tif bands
+#fo_blue = gdal.Open(blueband)
+#blue = fo_blue.ReadAsArray()
+
+#fo_green = gdal.Open(greenband)
+print 'Open and Read red band'
+fo_red = gdal.Open(redband)
+red = fo_red.ReadAsArray()
+fo_red = None
+print 'Open and Read nir band'
+fo_nir = gdal.Open(nirband)
+nir = fo_nir.ReadAsArray()
+fo_nir = None
+print 'Open and Read swir1 band'
+fo_swir1 = gdal.Open(swir1band)
+swir1 = fo_swir1.ReadAsArray()
+fo_swir1 = None
+print 'Open and Read swir2 band'
+fo_swir2 = gdal.Open(swir2band)
+swir2 = fo_swir2.ReadAsArray()
+
+#fo_pan = gdal.Open(panband)
+#fo_cirrus = gdal.Open(cirrusband)
+#fo_tirs1 = gdal.Open(tirs1band)
+#fo_tirs2 = gdal.Open(tirs2band)
+
+#Set proj/res/extent
+proj = fo_swir2.GetProjection()
+geo = fo_swir2.GetGeoTransform()
+shape = red.shape
+#nx = fo_swir1.RasterXSize
+#ny = fo_swir1.RasterYSize
+
+print '\n Projection: ', proj
+print 'Geo Datum: ', geo
+print 'Image Dimensions: ', shape
+
+#fh_array = [fo_blue, fo_green, fo_red, fo_nir, fo_swir1, fo_swir2, fo_pan, fo_cirrus, fo_tirs1, fo_tirs2 ]
+#thermal_array = [False, False, False, False, False, False, False, False, True, True]
+#nbo = len(fh_array)
+
+#nx100 = fo_tirs1.RasterXSize
+#ny100 = fo_tirs1.RasterYSize
+
+gaincoef = np.zeros((len(lmax)))
+offcoef = np.zeros((len(lmax)))
+
+ogaincoef = gaincoef[[0,1,2,3,4,5,6,7,8,9]]
+ooffcoef = offcoef[[0,1,2,3,4,5,6,7,8,9]]
+
+#Housekeeping
+
+fo_nir = None
+fo_swir1 = None
+fo_swir2 = None
