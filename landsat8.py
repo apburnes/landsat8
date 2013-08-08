@@ -11,9 +11,11 @@ import sys
 import os.path
 import os
 import datetime
+import image_process as iproc
 from scipy import weave
 from scipy.weave import converters
 
+reload(iproc)
 create_layer_for_vector = True
 create_satvi = True
 L = 0.1
@@ -116,58 +118,41 @@ theta = (np.pi * sun_zen_deg)/180.0
 toa_ref = 1.21068/sun_zen_deg 
 E = [toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref,toa_ref]
 
-#GDAL open and read tif bands
-#fo_blue = gdal.Open(blueband)
-#blue = fo_blue.ReadAsArray()
+ndvi_out = outroot + '_ndiv.TIF'
 
-#fo_green = gdal.Open(greenband)
-print 'Open and Read red band'
-fo_red = gdal.Open(redband)
-red = fo_red.ReadAsArray()
-fo_red = None
-print 'Open and Read nir band'
-fo_nir = gdal.Open(nirband)
-nir = fo_nir.ReadAsArray()
-fo_nir = None
-print 'Open and Read swir1 band'
-fo_swir1 = gdal.Open(swir1band)
-swir1 = fo_swir1.ReadAsArray()
-fo_swir1 = None
-print 'Open and Read swir2 band'
-fo_swir2 = gdal.Open(swir2band)
-swir2 = fo_swir2.ReadAsArray()
+ndvi_calc = iproc.calculate_ndvi(redband, nirband)
 
-#fo_pan = gdal.Open(panband)
-#fo_cirrus = gdal.Open(cirrusband)
-#fo_tirs1 = gdal.Open(tirs1band)
-#fo_tirs2 = gdal.Open(tirs2band)
+iproc.save_raster(ndvi_out, redband, ndvi_calc)
+
+
+#open tifs and covert to arrays for processing
+#print 'Open and Read red band'
+#fo_red = gdal.Open(redband)
+#red = fo_red.ReadAsArray()
+#fo_red = None
+#print 'Open and Read nir band'
+#fo_nir = gdal.Open(nirband)
+#nir = fo_nir.ReadAsArray()
+#fo_nir = None
+#print 'Open and Read swir1 band'
+#fo_swir1 = gdal.Open(swir1band)
+#swir1 = fo_swir1.ReadAsArray()
+#fo_swir1 = None
+#print 'Open and Read swir2 band'
+#fo_swir2 = gdal.Open(swir2band)
+#swir2 = fo_swir2.ReadAsArray()
 
 #Set proj/res/extent
-proj = fo_swir2.GetProjection()
-geo = fo_swir2.GetGeoTransform()
-shape = red.shape
-#nx = fo_swir1.RasterXSize
-#ny = fo_swir1.RasterYSize
-
-print '\n Projection: ', proj
-print 'Geo Datum: ', geo
-print 'Image Dimensions: ', shape
-
-#fh_array = [fo_blue, fo_green, fo_red, fo_nir, fo_swir1, fo_swir2, fo_pan, fo_cirrus, fo_tirs1, fo_tirs2 ]
-#thermal_array = [False, False, False, False, False, False, False, False, True, True]
-#nbo = len(fh_array)
-
-#nx100 = fo_tirs1.RasterXSize
-#ny100 = fo_tirs1.RasterYSize
-
-gaincoef = np.zeros((len(lmax)))
-offcoef = np.zeros((len(lmax)))
-
-ogaincoef = gaincoef[[0,1,2,3,4,5,6,7,8,9]]
-ooffcoef = offcoef[[0,1,2,3,4,5,6,7,8,9]]
+#proj = fo_swir2.GetProjection()
+#geo = fo_swir2.GetGeoTransform()
+#shape = red.shape
 
 #Housekeeping
+#fo_nir = None
+#fo_swir1 = None
+#fo_swir2 = None
 
-fo_nir = None
-fo_swir1 = None
-fo_swir2 = None
+#del red
+#del nir
+#del swir1
+#del swir2
